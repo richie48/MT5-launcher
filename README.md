@@ -4,7 +4,7 @@ There is presently no clean way to launch multiple metatrader5 sessions on a sin
 ### How to run launcher   
 Install go from the official go [website](https://go.dev/doc/install)   
 
-This script is not packages as it only relies on go official packages
+This script is not packaged as it only relies on go official packages
 ```
 go run main.go
 ```   
