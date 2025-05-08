@@ -1,13 +1,13 @@
 [
     {
-        "Name": "xxxxxx",
+        "Name": "1xxx",
         "Login": "1xxxxxxx",
         "Password": "1xxxxx",
         "Server": "1xxxxxx",
         "Path": "../1xx/terminal64.exe"
     },
     {   
-        "Name": "xxxxxx",
+        "Name": "2xxx",
         "Login": "2xxxxxxx",
         "Password": "2xxxxx",
         "Server": "2xxxxxx",

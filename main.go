@@ -4,8 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 )
+
+const BASE_DIR string = "/mnt/c/Program Files/MetaTrader 5/"
+const CONFIG_FILE string = "config-example.json"
+const PERMISSIONS fs.FileMode = 0755
 
 type Account struct {
 	Name     string
@@ -15,8 +20,36 @@ type Account struct {
 	Path     string
 }
 
+func createInstance(account Account) {
+	var instanceDirectory string = "MT5_" + account.Name
+
+	if _, err := os.Stat(instanceDirectory); !os.IsNotExist(err) {
+		fmt.Println(instanceDirectory, "already exist, skipping!")
+		return
+	}
+
+	fmt.Println("creating instance ", instanceDirectory)
+
+	if err := os.MkdirAll(instanceDirectory, PERMISSIONS); err != nil {
+		fmt.Println("error creating directory", instanceDirectory)
+	}
+
+	files, err := os.ReadDir(BASE_DIR)
+
+	if err != nil {
+		fmt.Println("error reading directory", BASE_DIR)
+		return
+	}
+
+	for _, file := range files {
+		// TODO: copy files to destination
+
+	}
+
+}
+
 func main() {
-	jsonFile, err := os.Open("config-example.json")
+	jsonFile, err := os.Open(CONFIG_FILE)
 
 	if err != nil {
 		fmt.Println(err)
@@ -38,6 +71,6 @@ func main() {
 	}
 
 	for _, account := range accounts {
-		fmt.Printf("account name: " + account.Name)
+		createInstance(account)
 	}
 }
