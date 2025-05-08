@@ -6,9 +6,10 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 )
 
-const BASE_DIR string = "/mnt/c/Program Files/MetaTrader 5/"
+const BASE_DIR string = "/mnt/c/Program Files/MetaTrader 5"
 const CONFIG_FILE string = "config-example.json"
 const PERMISSIONS fs.FileMode = 0755
 
@@ -18,6 +19,26 @@ type Account struct {
 	Password string
 	Server   string
 	Path     string
+}
+
+func copyFile(source string, destination string) error {
+	sourceFile, err := os.Open(source)
+	if err != nil {
+		return err
+	}
+
+	defer sourceFile.Close()
+
+	destinationFile, err := os.Create(destination)
+
+	if err != nil {
+		return err
+	}
+
+	defer destinationFile.Close()
+
+	_, err = io.Copy(destinationFile, sourceFile)
+	return err
 }
 
 func createInstance(account Account) {
@@ -42,7 +63,17 @@ func createInstance(account Account) {
 	}
 
 	for _, file := range files {
-		// TODO: copy files to destination
+		sourcePath := filepath.Join(BASE_DIR, file.Name())
+		destinationPath := filepath.Join(instanceDirectory, file.Name())
+
+		if file.IsDir() {
+			// TODO: do some work to copy files
+			continue
+		}
+
+		if err := copyFile(sourcePath, destinationPath); err != nil {
+			fmt.Println("Error copying files:", err)
+		}
 
 	}
 
