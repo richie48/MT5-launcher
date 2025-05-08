@@ -41,6 +41,41 @@ func copyFile(source string, destination string) error {
 	return err
 }
 
+func recursiveCopy(sourceDirectory string, destinationDirectory string) {
+
+	files, err := os.ReadDir(sourceDirectory)
+
+	if err != nil {
+		fmt.Println("error reading directory", sourceDirectory)
+		return
+	}
+
+	for _, file := range files {
+		sourcePath := filepath.Join(sourceDirectory, file.Name())
+		destinationPath := filepath.Join(destinationDirectory, file.Name())
+
+		if file.IsDir() {
+			childSourceDirectory := sourceDirectory + "/" + file.Name()
+			childDestinationDirectory := destinationDirectory + "/" + file.Name()
+
+			err := os.Mkdir(childDestinationDirectory, PERMISSIONS)
+			if err != nil {
+				fmt.Println("error creating directory", childDestinationDirectory)
+				return
+			}
+
+			recursiveCopy(childSourceDirectory, childDestinationDirectory)
+
+		} else {
+
+			if err := copyFile(sourcePath, destinationPath); err != nil {
+				fmt.Println("Error copying files:", err)
+			}
+		}
+
+	}
+}
+
 func createInstance(account Account) {
 	var instanceDirectory string = "MT5_" + account.Name
 
@@ -55,27 +90,7 @@ func createInstance(account Account) {
 		fmt.Println("error creating directory", instanceDirectory)
 	}
 
-	files, err := os.ReadDir(BASE_DIR)
-
-	if err != nil {
-		fmt.Println("error reading directory", BASE_DIR)
-		return
-	}
-
-	for _, file := range files {
-		sourcePath := filepath.Join(BASE_DIR, file.Name())
-		destinationPath := filepath.Join(instanceDirectory, file.Name())
-
-		if file.IsDir() {
-			// TODO: do some work to copy files
-			continue
-		}
-
-		if err := copyFile(sourcePath, destinationPath); err != nil {
-			fmt.Println("Error copying files:", err)
-		}
-
-	}
+	recursiveCopy(BASE_DIR, instanceDirectory)
 
 }
 
