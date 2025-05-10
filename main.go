@@ -87,7 +87,7 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 	return fileCopyError
 }
 
-// CreateInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
+// createInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
 // and some details in 'account'. The aim of this directory is to replicate everything
 // fould in the directory 'BaseDir'. Return error if anything goes wrong.
 func createInstance(account Account, baseDir string) error {
