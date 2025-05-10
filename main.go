@@ -5,14 +5,16 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 )
 
-const BASE_DIR string = "/mnt/c/Program Files/MetaTrader 5"
-const CONFIG_FILE string = "config-example.json"
-const PERMISSIONS fs.FileMode = 0755
+const ConfigFile string = "config.json"
+const FolderPrefix string = "MT5_"
+const Permissions fs.FileMode = 0755
 
+// Account is used to represent individual config for the array in config.json
 type Account struct {
 	Name     string
 	Login    string
@@ -21,17 +23,19 @@ type Account struct {
 	Path     string
 }
 
+// copyFile copies a file from 'source' path to the 'destination' path provided
 func copyFile(source string, destination string) error {
 	sourceFile, err := os.Open(source)
 	if err != nil {
+		fmt.Errorf("error=", err)
 		return err
 	}
 
 	defer sourceFile.Close()
 
 	destinationFile, err := os.Create(destination)
-
 	if err != nil {
+		fmt.Errorf("error=", err)
 		return err
 	}
 
@@ -41,13 +45,14 @@ func copyFile(source string, destination string) error {
 	return err
 }
 
-func recursiveCopy(sourceDirectory string, destinationDirectory string) {
+// recursiveCopy recursively copies all the files in the 'sourceDirectory' to
+// 'destinationDirectory'. Return an error if anything goes wrong'
+func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 
 	files, err := os.ReadDir(sourceDirectory)
-
 	if err != nil {
-		fmt.Println("error reading directory", sourceDirectory)
-		return
+		fmt.Errorf("error reading directory", sourceDirectory)
+		return err
 	}
 
 	for _, file := range files {
@@ -58,65 +63,78 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) {
 			childSourceDirectory := sourceDirectory + "/" + file.Name()
 			childDestinationDirectory := destinationDirectory + "/" + file.Name()
 
-			err := os.Mkdir(childDestinationDirectory, PERMISSIONS)
+			err := os.Mkdir(childDestinationDirectory, Permissions)
 			if err != nil {
-				fmt.Println("error creating directory", childDestinationDirectory)
-				return
+				fmt.Errorf("error creating directory", childDestinationDirectory)
+				return err
 			}
 
-			recursiveCopy(childSourceDirectory, childDestinationDirectory)
+			return recursiveCopy(childSourceDirectory, childDestinationDirectory)
 
 		} else {
 
-			if err := copyFile(sourcePath, destinationPath); err != nil {
-				fmt.Println("Error copying files:", err)
+			err := copyFile(sourcePath, destinationPath)
+			if err != nil {
+				fmt.Errorf("Error copying files", err)
 			}
 		}
 
 	}
+	return nil
 }
 
-func createInstance(account Account) {
-	var instanceDirectory string = "MT5_" + account.Name
+// CreateInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
+// and some details in 'account'. The aim of this directory is to replicate everything
+// fould in the directory 'BaseDir'. Return error if anything goes wrong.
+func createInstance(account Account, baseDir string) error {
+	var instanceDirectory string = FolderPrefix + account.Name + account.Login
 
 	if _, err := os.Stat(instanceDirectory); !os.IsNotExist(err) {
 		fmt.Println(instanceDirectory, "already exist, skipping!")
-		return
+		return err
 	}
 
-	fmt.Println("creating instance ", instanceDirectory)
+	log.Println("creating instance ", instanceDirectory)
 
-	if err := os.MkdirAll(instanceDirectory, PERMISSIONS); err != nil {
-		fmt.Println("error creating directory", instanceDirectory)
+	if err := os.Mkdir(instanceDirectory, Permissions); err != nil {
+		fmt.Errorf("error creating directory", instanceDirectory)
+		return err
 	}
 
-	recursiveCopy(BASE_DIR, instanceDirectory)
-
+	return recursiveCopy(baseDir, instanceDirectory)
 }
 
 func main() {
-	jsonFile, err := os.Open(CONFIG_FILE)
-
-	if err != nil {
-		fmt.Println(err)
+	Basedir := os.Getenv("BASE_DIR")
+	if Basedir == "" {
+		log.Fatal("BASE_DIR not set")
 	}
 
-	fmt.Println("opened json file", jsonFile)
+	jsonFile, err := os.Open(ConfigFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	defer jsonFile.Close()
 
 	byteValue, err := io.ReadAll(jsonFile)
-
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	var accounts []Account
 	if err := json.Unmarshal(byteValue, &accounts); err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	for _, account := range accounts {
-		createInstance(account)
+		err := createInstance(account, Basedir)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// TODO: work to launch each account MT5, generate config.ini for this
 	}
+
+	log.Println("successfully created MT5 instance for all accounts!")
 }
