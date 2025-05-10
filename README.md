@@ -9,7 +9,7 @@ Install go from the official go [website](https://go.dev/doc/install)
 
 This script is not packaged as it only relies on go official packages
 ```
-BASE_DIR=/mnt/c/"Program Files"/"MetaTrader 5" go run .
+BASE_DIR=/mnt/c/"Program Files"/"MetaTrader 5" go run main.go
 ```   
 Ensure to format if making any modification `gofmt -w main.go`   
 Logging only top level issues, everything else is printed to the terminal

@@ -76,10 +76,12 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 			err := copyFile(sourcePath, destinationPath)
 			if err != nil {
 				fmt.Errorf("Error copying files", err)
+				return err
 			}
 		}
 
 	}
+
 	return nil
 }
 
@@ -91,10 +93,10 @@ func createInstance(account Account, baseDir string) error {
 
 	if _, err := os.Stat(instanceDirectory); !os.IsNotExist(err) {
 		fmt.Println(instanceDirectory, "already exist, skipping!")
-		return err
+		return nil
 	}
 
-	log.Println("creating instance ", instanceDirectory)
+	fmt.Println("creating instance ", instanceDirectory)
 
 	if err := os.Mkdir(instanceDirectory, Permissions); err != nil {
 		fmt.Errorf("error creating directory", instanceDirectory)
