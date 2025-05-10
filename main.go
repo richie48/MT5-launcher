@@ -55,6 +55,8 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 		return err
 	}
 
+	var fileCopyError error
+
 	for _, file := range files {
 		sourcePath := filepath.Join(sourceDirectory, file.Name())
 		destinationPath := filepath.Join(destinationDirectory, file.Name())
@@ -69,7 +71,7 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 				return err
 			}
 
-			return recursiveCopy(childSourceDirectory, childDestinationDirectory)
+			fileCopyError = recursiveCopy(childSourceDirectory, childDestinationDirectory)
 
 		} else {
 
@@ -82,7 +84,7 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 
 	}
 
-	return nil
+	return fileCopyError
 }
 
 // CreateInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
