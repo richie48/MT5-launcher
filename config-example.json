@@ -4,13 +4,13 @@
         "Login": "1xxxxxxx",
         "Password": "1xxxxx",
         "Server": "1xxxxxx",
-        "Path": "../1xx/terminal64.exe"
+        "Path": "MT5_1xxx/terminal64.exe"
     },
     {   
         "Name": "2xxx",
         "Login": "2xxxxxxx",
         "Password": "2xxxxx",
         "Server": "2xxxxxx",
-        "Path": "../2xx/terminal64.exe"
+        "Path": "MT5_2xxx/terminal64.exe"
     }
 ]

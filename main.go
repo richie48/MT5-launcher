@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 )
 
@@ -27,7 +28,7 @@ type Account struct {
 func copyFile(source string, destination string) error {
 	sourceFile, err := os.Open(source)
 	if err != nil {
-		fmt.Errorf("error=", err)
+		fmt.Errorf("error opening file", err)
 		return err
 	}
 
@@ -35,11 +36,16 @@ func copyFile(source string, destination string) error {
 
 	destinationFile, err := os.Create(destination)
 	if err != nil {
-		fmt.Errorf("error=", err)
+		fmt.Errorf("error creating file", err)
 		return err
 	}
 
 	defer destinationFile.Close()
+
+	if err := os.Chmod(destination, Permissions); err != nil {
+		fmt.Errorf("error setting file permission", err)
+		return err
+	}
 
 	_, err = io.Copy(destinationFile, sourceFile)
 	return err
@@ -90,8 +96,7 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 // createInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
 // and some details in 'account'. The aim of this directory is to replicate everything
 // fould in the directory 'BaseDir'. Return error if anything goes wrong.
-func createInstance(account Account, baseDir string) error {
-	var instanceDirectory string = FolderPrefix + account.Name + account.Login
+func createInstance(account Account, baseDir string, instanceDirectory string) error {
 
 	if _, err := os.Stat(instanceDirectory); !os.IsNotExist(err) {
 		fmt.Println(instanceDirectory, "already exist, skipping!")
@@ -106,6 +111,24 @@ func createInstance(account Account, baseDir string) error {
 	}
 
 	return recursiveCopy(baseDir, instanceDirectory)
+}
+
+
+// createInstanceConfig attempts to create the config.ini file start up file which will
+// be used to boot up the MT5 instance in 'instanceDirectory' for 'account'
+func createInstanceConfig(account Account, instanceDirectory string) (string, error) {
+	var accountConfig string = instanceDirectory + "/" + account.Name + ".ini"
+	configContent := fmt.Sprintf("[StartUp]\nLogin=%s\nPassword=%s\nServer=%s",
+		account.Login, account.Password, account.Server)
+
+	err := os.WriteFile(accountConfig, []byte(configContent), Permissions)
+	if err != nil {
+		fmt.Errorf("error writing config", accountConfig)
+		return accountConfig, err
+	}
+
+	log.Println("config", accountConfig, "setup!")
+	return accountConfig, err
 }
 
 func main() {
@@ -132,12 +155,24 @@ func main() {
 	}
 
 	for _, account := range accounts {
-		err := createInstance(account, Basedir)
+		var instanceDirectory string = FolderPrefix + account.Name
+		err := createInstance(account, Basedir, instanceDirectory)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// TODO: work to launch each account MT5, generate config.ini for this
+		accountConfig, err := createInstanceConfig(account, instanceDirectory)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// execute MT5 launcher
+		command := exec.Command(account.Path, "/config:", accountConfig)
+		if err := command.Start(); err != nil {
+			log.Fatal("Failed to launch MT5 instance ", err)
+		}
+
+		log.Println(account.Path, "MT5 instance successfully started!")
 	}
 
 	log.Println("successfully created MT5 instance for all accounts!")

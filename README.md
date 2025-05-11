@@ -7,9 +7,9 @@ Download MT5 following the guidelines for your operating system [here](https://w
 ### How to run launcher   
 Install go from the official go [website](https://go.dev/doc/install)   
 
-This script is not packaged as it only relies on go official packages
+This script is not packaged as it only relies on go official packages. Run with the provided code below.   
 ```
 BASE_DIR=/mnt/c/"Program Files"/"MetaTrader 5" go run main.go
 ```   
 Ensure to format if making any modification `gofmt -w main.go`   
-Logging only top level issues, everything else is printed to the terminal
+Logging only top level issues, everything else is printed to the terminal. This is a stop on first failure task, it adviseable to cleanup folders if the script is terminated in the middle of running as the script may have made partial updates to folders. 
