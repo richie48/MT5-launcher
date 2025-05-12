@@ -161,6 +161,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	noLaunch := false // default
+	args := os.Args[1:]
+	for _, arg := range args {
+		if arg == "--no-launch" {
+			noLaunch = true
+			log.Println("running in NO_LAUNCH MODE")
+		}
+	}
+
 	for _, account := range accounts {
 		var instanceDirectory string = FolderPrefix + account.Name
 		accountConfig, err := createInstance(account, Basedir, instanceDirectory)
@@ -168,13 +177,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		// TODO: execute MT5 instance launcher with wine
-		// configArgument := "/config:" + accountConfig
-		// command := exec.Command(account.Path, configArgument)
-		// if err := command.Start(); err != nil {
-		// 	log.Fatal("Failed to launch MT5 instance ", err)
-		// }
-		// log.Println(account.Path, "MT5 instance successfully started!")
+		if !noLaunch {
+			// TODO: execute MT5 instance launcher with wine
+			configArgument := "/config:" + accountConfig
+			command := exec.Command(account.Path, configArgument)
+			if err := command.Start(); err != nil {
+				log.Fatal("Failed to launch MT5 instance ", err)
+			}
+			log.Println(account.Path, "MT5 instance successfully started!")
+		}
+
 	}
 
 	log.Println("successfully created MT5 instance for all accounts!")
