@@ -178,7 +178,6 @@ func main() {
 		}
 
 		if !noLaunch {
-			// TODO: execute MT5 instance launcher with wine
 			configArgument := "/config:" + accountConfig
 			command := exec.Command(account.Path, configArgument)
 			if err := command.Start(); err != nil {
