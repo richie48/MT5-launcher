@@ -18,7 +18,7 @@ const Permissions fs.FileMode = 0755
 // Account is used to represent individual config for the array in config.json
 type Account struct {
 	Name     string
-	Login    string
+	Login    uint32
 	Password string
 	Server   string
 	Path     string
@@ -97,7 +97,7 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 // used as start up file when booting up the MT5 instance for 'account'. Returns an error if it
 // fails to create config.
 func createInstanceConfig(account Account, expectedConfigLocation string) error {
-	configContent := fmt.Sprintf("[Login]\nLogin=%s\nPassword=%s\nServer=%s",
+	configContent := fmt.Sprintf("[Login]\nLogin=%d\nPassword=%s\nServer=%s",
 		account.Login, account.Password, account.Server)
 
 	err := os.WriteFile(expectedConfigLocation, []byte(configContent), Permissions)
@@ -125,7 +125,7 @@ func createInstance(account Account, baseDir string, instanceDirectory string) (
 
 	fmt.Println("creating instance ", instanceDirectory)
 
-	if err := os.Mkdir(instanceDirectory, Permissions); err != nil {
+	if err := os.MkdirAll(instanceDirectory, Permissions); err != nil {
 		fmt.Errorf("error creating directory", instanceDirectory)
 		return "", err
 	}
