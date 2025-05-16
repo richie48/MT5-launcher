@@ -1,14 +1,14 @@
 [
     {
         "Name": "1xxx",
-        "Login": "1xxxxxxx",
+        "Login": 11231344,
         "Password": "1xxxxx",
         "Server": "1xxxxxx",
         "Path": "MT5_1xxx/terminal64.exe"
     },
     {   
         "Name": "2xxx",
-        "Login": "2xxxxxxx",
+        "Login": 19165914,
         "Password": "2xxxxx",
         "Server": "2xxxxxx",
         "Path": "MT5_2xxx/terminal64.exe"
