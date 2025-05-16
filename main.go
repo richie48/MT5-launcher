@@ -18,7 +18,7 @@ const Permissions fs.FileMode = 0755
 // Account is used to represent individual config for the array in config.json
 type Account struct {
 	Name     string
-	Login    uint32
+	Login    int64
 	Password string
 	Server   string
 	Path     string
@@ -68,8 +68,8 @@ func recursiveCopy(sourceDirectory string, destinationDirectory string) error {
 		destinationPath := filepath.Join(destinationDirectory, file.Name())
 
 		if file.IsDir() {
-			childSourceDirectory := sourceDirectory + "/" + file.Name()
-			childDestinationDirectory := destinationDirectory + "/" + file.Name()
+			childSourceDirectory := filepath.Join(sourceDirectory, file.Name())
+			childDestinationDirectory := filepath.Join(destinationDirectory, file.Name())
 
 			err := os.Mkdir(childDestinationDirectory, Permissions)
 			if err != nil {
@@ -112,9 +112,9 @@ func createInstanceConfig(account Account, expectedConfigLocation string) error 
 
 // createInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
 // and some details in 'account'. The aim of this directory is to replicate everything
-// fould in the directory 'BaseDirectory'. Return error if anything goes wrong. Also returns
+// fould in the directory 'SourceDirectory'. Return error if anything goes wrong. Also returns
 // name location of generated config ini
-func createInstance(account Account, baseDirectory string, instanceDirectory string) (string, error) {
+func createInstance(account Account, sourceDirectory string, instanceDirectory string) (string, error) {
 
 	var expectedConfigLocation string = filepath.Join(instanceDirectory, account.Name+".ini")
 
@@ -135,7 +135,7 @@ func createInstance(account Account, baseDirectory string, instanceDirectory str
 		return expectedConfigLocation, err
 	}
 
-	return expectedConfigLocation, recursiveCopy(baseDirectory, instanceDirectory)
+	return expectedConfigLocation, recursiveCopy(sourceDirectory, instanceDirectory)
 }
 
 func main() {
