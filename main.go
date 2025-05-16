@@ -112,11 +112,11 @@ func createInstanceConfig(account Account, expectedConfigLocation string) error 
 
 // createInstance attempts to create a directory. Its name prefixed with 'FolderPrefix'
 // and some details in 'account'. The aim of this directory is to replicate everything
-// fould in the directory 'BaseDir'. Return error if anything goes wrong. Also returns
+// fould in the directory 'BaseDirectory'. Return error if anything goes wrong. Also returns
 // name location of generated config ini
-func createInstance(account Account, baseDir string, instanceDirectory string) (string, error) {
+func createInstance(account Account, baseDirectory string, instanceDirectory string) (string, error) {
 
-	var expectedConfigLocation string = instanceDirectory + "/" + account.Name + ".ini"
+	var expectedConfigLocation string = filepath.Join(instanceDirectory, account.Name+".ini")
 
 	if _, err := os.Stat(instanceDirectory); !os.IsNotExist(err) {
 		fmt.Println(instanceDirectory, "already exist, skipping!")
@@ -125,7 +125,7 @@ func createInstance(account Account, baseDir string, instanceDirectory string) (
 
 	fmt.Println("creating instance ", instanceDirectory)
 
-	if err := os.MkdirAll(instanceDirectory, Permissions); err != nil {
+	if err := os.Mkdir(instanceDirectory, Permissions); err != nil {
 		fmt.Errorf("error creating directory", instanceDirectory)
 		return "", err
 	}
@@ -135,13 +135,18 @@ func createInstance(account Account, baseDir string, instanceDirectory string) (
 		return expectedConfigLocation, err
 	}
 
-	return expectedConfigLocation, recursiveCopy(baseDir, instanceDirectory)
+	return expectedConfigLocation, recursiveCopy(baseDirectory, instanceDirectory)
 }
 
 func main() {
-	Basedir := os.Getenv("BASE_DIR")
-	if Basedir == "" {
+	BaseDirectory := os.Getenv("BASE_DIR")
+	if BaseDirectory == "" {
 		log.Fatal("BASE_DIR not set")
+	}
+
+	SourceDirectory := os.Getenv("SRC_DIR")
+	if SourceDirectory == "" {
+		log.Fatal("SRC_DIR not set")
 	}
 
 	jsonFile, err := os.Open(ConfigFile)
@@ -171,8 +176,9 @@ func main() {
 	}
 
 	for _, account := range accounts {
-		var instanceDirectory string = FolderPrefix + account.Name
-		accountConfig, err := createInstance(account, Basedir, instanceDirectory)
+		var fullSourceDirectoryPath string = filepath.Join(BaseDirectory, SourceDirectory)
+		var fullInstanceDirectoryPath string = filepath.Join(BaseDirectory, FolderPrefix+account.Name)
+		accountConfig, err := createInstance(account, fullSourceDirectoryPath, fullInstanceDirectoryPath)
 		if err != nil {
 			log.Fatal(err)
 		}
