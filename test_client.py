@@ -1,4 +1,4 @@
-from pymt5linux import MetaTrader5
+from mt5linux_updated import MetaTrader5
 
 import json
 import os

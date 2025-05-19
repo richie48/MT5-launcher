@@ -16,9 +16,9 @@ BASE_DIR=/home/<your_user>/.mt5/drive_c/"Program Files" SRC_DIR="MetaTrader 5" g
 ```   
 
 ### How to run test   
-To test we would need to install [pymt5linux](https://pypi.org/project/pymt5linux/). Make sure to follow the steps outlined to get it running. The goal of this package to provide a way to run metaTrader5 on linux. It does it by forwarding request to a different port where we have our windows emulator running metaTrader5. That way metaTrader5 is able to carry out our request as if we were on a windows machine. Now that we have everything setup we can run our test!
+To test we would need to install [pymt5linux](https://pypi.org/project/pymt5linux/). Make sure to follow the steps outlined to get it running. The goal of this package to provide a way to run metaTrader5 on linux. It does it by forwarding request to a different port where we have our windows emulator running metaTrader5. That way metaTrader5 is able to carry out our request as if we were on a windows machine. Install pymt5linux on windows emulator but use [mt5linux_updated](https://pypi.org/project/mt5linux-updated/) on linux. pymt5linux needs to run on both linux and windows with python3.13 but version 3.13 is still an experimental version, therefore it's better to run on python3.12 where i can as this is a stable version.  Now that we have everything setup we can run our test!
 ```
-BASE_DIR=/home/<your_user>/.mt5/drive_c/"Program Files" python3.13 test_client.py
+BASE_DIR=/home/<your_user>/.mt5/drive_c/"Program Files" python3.12 test_client.py
 ```   
    
 Ensure to format if making any modification `gofmt -w main.go`   
