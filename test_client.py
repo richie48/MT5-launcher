@@ -13,13 +13,13 @@ def test_metatrader5_works_on_linux():
 
     for config_data in config_data_list:
         instance_executable_path = os.path.join(BASE_DIRECTORY, config_data["Path"])
-        authorized = mt5_client.initialize(
+        initialized = mt5_client.initialize(
             path=instance_executable_path,
             login=config_data["Login"],
             server=config_data["Server"],
             password=config_data["Password"],
         )
-        if authorized:
+        if initialized:
             print("{0} got connected!".format(config_data["Name"]))
         assert mt5_client.account_info() is not None
 
