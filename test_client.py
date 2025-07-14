@@ -19,8 +19,8 @@ def test_metatrader5_works_on_linux():
             server=config_data["Server"],
             password=config_data["Password"],
         )
-
-        print("{0} got connected!".format(config_data["Name"]))
+        if authorized:
+            print("{0} got connected!".format(config_data["Name"]))
         assert mt5_client.account_info() is not None
 
 if __name__ == "__main__": 
