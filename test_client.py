@@ -33,14 +33,14 @@ def test_metatrader5_works_on_linux():
                 symbol, True
             ), "symbol_select({}) failed".format(symbol)
 
-        lot = 1.0
+        lot = 1.01111
         point = mt5_client.symbol_info(symbol).point
         price = mt5_client.symbol_info_tick(symbol).bid
         deviation = 20
         request = {
             "action": mt5_client.TRADE_ACTION_PENDING,
             "symbol": symbol,
-            "volume": lot,
+            "volume": round(lot, ndigits=2),
             "type": mt5_client.ORDER_TYPE_BUY_STOP,
             "price": price + 1000 * point,
             "sl": price - 1000 * point,
