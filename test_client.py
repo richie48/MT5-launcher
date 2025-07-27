@@ -20,7 +20,7 @@ def test_metatrader5_works_on_linux():
             server=config_data["Server"],
             password=config_data["Password"],
         )
-        assert initialized, "{0} got connected!".format(config_data["Name"])
+        assert initialized, "{0} failed to connect!".format(config_data["Name"])
         assert mt5_client.account_info() is not None
 
         # prepare request
